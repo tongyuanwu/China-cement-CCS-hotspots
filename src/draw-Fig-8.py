@@ -1,5 +1,32 @@
+import numpy as np
+import pandas as pd
+import geopandas as gpd
+from matplotlib import pyplot as plt
+import matplotlib.colors as mcolors
+import matplotlib as mpl
+import seaborn as sns
+import os
 
+China_provinces = gpd.read_file('../data/China-maps/province.shp')
+China_boundary = gpd.read_file('../data/China-maps/boundary.shp')
+China_counties = gpd.read_file('../data/China-maps/county.shp')
+China_provinces2 = gpd.read_file('../data/China-maps-simplified/province.shp')
+China_counties2 = gpd.read_file('../data/China-maps-simplified/county.shp')
+China_provinces['geometry'] = China_provinces2['geometry']
+China_counties['geometry'] = China_counties2['geometry']
+China_counties = China_counties.drop([176, 638, 639, 2403])
+China_counties = China_counties.reset_index(drop=True)
 
+China_provinces = China_provinces.to_crs(2381)
+China_boundary = China_boundary.to_crs(2381)
+China_counties = China_counties.to_crs(2381)
+
+storage_capacity = pd.read_csv('../outputs/China_county_carbon_storage.csv', )
+storage_capacity = storage_capacity.drop([176, 638, 639, 2403])
+storage_capacity = storage_capacity.reset_index(drop=True)
+
+China_counties['G_DSA'] = storage_capacity['G_DSA']
+China_counties['G_EOR'] = storage_capacity['G_EOR']
 
 
 fig = plt.figure(figsize=(9, 3.5), constrained_layout=True)
@@ -71,4 +98,4 @@ fig.text(0.01, 0.93, 'a', fontsize=14, fontdict={'weight': 'semibold'})
 fig.text(0.51, 0.93, 'b', fontsize=14, fontdict={'weight': 'semibold'})
 
 plt.show()
-fig.savefig(r'figures/Fig_8.jpg', dpi=600, bbox_inches='tight')
+fig.savefig('../figures/Fig_8.jpg', dpi=600, bbox_inches='tight')

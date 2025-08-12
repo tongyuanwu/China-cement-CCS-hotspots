@@ -12,8 +12,8 @@ def distribute_cement_demand(SSP, b):
     county_POP = pd.read_csv(os.path.join('..', 'outputs', f'China_county_population_{SSP}.csv'))
     county_GDP = pd.read_csv(os.path.join('..', 'outputs', f'China_county_GDP_{SSP}.csv'))
 
-    county_POP.drop([176, 2403], inplace=True)
-    county_GDP.drop([176, 2403], inplace=True)
+    county_POP.drop([176, 638, 639, 2403], inplace=True)
+    county_GDP.drop([176, 638, 639, 2403], inplace=True)
 
     results = pd.DataFrame([], columns=['省', '市', '县', '县代码']+[t for t in range(2020, 2055, 5)])
     results[['省', '市', '县', '县代码']] = county_GDP[['省', '市', '县', '县代码']] 

@@ -1,4 +1,44 @@
+import numpy as np
+import pandas as pd
+import geopandas as gpd
+from matplotlib import pyplot as plt
+import matplotlib.colors as mcolors
+import seaborn as sns
+import os
 
+China_provinces = gpd.read_file('../data/China-maps/province.shp')
+China_boundary = gpd.read_file('../data/China-maps/boundary.shp')
+China_counties = gpd.read_file('../data/China-maps/county.shp')
+China_provinces2 = gpd.read_file('../data/China-maps-simplified/province.shp')
+China_counties2 = gpd.read_file('../data/China-maps-simplified/county.shp')
+China_provinces['geometry'] = China_provinces2['geometry']
+China_counties['geometry'] = China_counties2['geometry']
+China_counties = China_counties.drop([176, 638, 639, 2403])
+China_counties = China_counties.reset_index(drop=True)
+
+China_provinces = China_provinces.to_crs(2381)
+China_boundary = China_boundary.to_crs(2381)
+China_counties = China_counties.to_crs(2381)
+
+county_CO2_POP = pd.read_csv('../outputs/China_county_CO2_POP.csv', index_col=0)
+county_CO2_GDP = pd.read_csv('../outputs/China_county_CO2_GDP.csv', index_col=0)
+county_CO2_combined = pd.read_csv('../outputs/China_county_CO2_combined.csv', index_col=0)
+
+
+cum_CO2_2050_POP = pd.Series((county_CO2_POP.loc[2021:2050].sum() / 1e3).values.round(1).tolist())
+cum_CO2_2050_GDP = pd.Series((county_CO2_GDP.loc[2021:2050].sum() / 1e3).values.round(1).tolist())
+cum_CO2_2050_combined = pd.Series((county_CO2_combined.loc[2021:2050].sum() / 1e3).values.round(1).tolist())
+
+
+China_counties['cum_CO2_2050_POP'] = np.where(cum_CO2_2050_POP.values == 0, np.nan, cum_CO2_2050_POP.values)
+China_counties['cum_CO2_2050_GDP'] = np.where(cum_CO2_2050_GDP.values == 0, np.nan, cum_CO2_2050_GDP.values) 
+China_counties['cum_CO2_2050_combined'] = np.where(cum_CO2_2050_combined.values == 0, np.nan, cum_CO2_2050_combined.values)
+
+China_counties['diff_CO2_2050_GDP'] = (China_counties['cum_CO2_2050_GDP'].fillna(0) - China_counties['cum_CO2_2050_POP'].fillna(0)).where(China_counties['cum_CO2_2050_GDP'].notnull() | China_counties['cum_CO2_2050_POP'].notnull())
+China_counties['diff_CO2_2050_combined'] = (China_counties['cum_CO2_2050_combined'].fillna(0) - China_counties['cum_CO2_2050_POP'].fillna(0)).where(China_counties['cum_CO2_2050_combined'].notnull() | China_counties['cum_CO2_2050_POP'].notnull())
+
+China_counties['diff_CO2_2050_GDP'] = China_counties['diff_CO2_2050_GDP'].replace(0, np.nan)
+China_counties['diff_CO2_2050_combined'] = China_counties['diff_CO2_2050_combined'].replace(0, np.nan)
 
 
 fig = plt.figure(figsize=(9, 4), constrained_layout=True)
@@ -74,4 +114,4 @@ fig.text(0.35, 0.76, 'b', fontsize=14, fontdict={'weight': 'semibold'})
 fig.text(0.68, 0.76, 'c', fontsize=14, fontdict={'weight': 'semibold'})
 
 plt.show()
-fig.savefig(r'figures/Fig_7.jpg', dpi=600, bbox_inches='tight')
+fig.savefig('../figures/Fig_7.jpg', dpi=600, bbox_inches='tight')

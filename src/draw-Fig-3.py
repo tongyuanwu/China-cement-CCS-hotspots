@@ -1,11 +1,9 @@
 import numpy as np
 import pandas as pd
 import geopandas as gpd
-from scipy.optimize import curve_fit
-import matplotlib as mpl
 import matplotlib.colors as mcolors
 from matplotlib import pyplot as plt
-from matplotlib.colors import BoundaryNorm, LogNorm
+from matplotlib.colors import BoundaryNorm
 import os
 
 China_provinces = gpd.read_file('../data/China-maps/province.shp')
