@@ -1,0 +1,15 @@
+__pycache__/
+.ipynb_checkpoints/
+.env
+*.env
+.venv/
+venv/
+
+data/*
+!data/README.md
+
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
